@@ -28,5 +28,34 @@
             <tbody></tbody>
 
         </table>
+        <div class="modal fade" id="crea-dipendente" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+
+                  <h4 class="modal-title float-left" id="modalLabel">Aggiungi Dipendente</h4>
+
+                  <button type="button" class="close float-right" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <form>
+                    <div class="form-group">
+                      <label for="nome" class="col-form-label">Nome:</label>
+                      <input type="text" class="form-control" id="nome">
+                    </div>
+                    <div class="form-group">
+                      <label for="cognome" class="col-form-label">Cognome:</label>
+                      <input type="text" class="form-control" id="cognome">
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
     </body>
 </html>

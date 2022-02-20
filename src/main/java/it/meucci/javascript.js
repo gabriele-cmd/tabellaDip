@@ -52,9 +52,38 @@ $(document).ready(function (){
     //Aggiungo un Dipendente
     $('#crea-dipendente').on('submit', function(element){
         element.preventDefault(); //prevenire il comportamento di default e poterlo gestire
-        
-    })
+        var form_action = $("#crea-dipendente").attr("action");
+        var nome = $("#nome");
+        var cognome = $("#cognome").val();
+        display = "create";
 
+        if(nome != "" && cognome != ""){
+          data.push({id: nextID, firstName: nome, lastName: cognome});
+          nextID++;
+          //Stampa il nuovo impiegato aggiunto
+          displayEmployeeList();
+
+          //Nascondi Modal
+          $("#crea-dipendente").modal('hide');
+          toastr.success('Item creato con Successo!', 'Success Alert', {timeout: 5000});
+        }
+        else{
+          alert("Tutti i campi devono essere riempiti! Riprova...");
+        }
+    });
+
+    //Elimina Dipendente
+    $("body").on("click", "elimina-dipendente", function(){
+      var id = $(this).parent("td").data("id");
+
+      for (let i = 0; i < data.length; i++){
+        if(data[i].id == id){
+          data.splice(i, 1);
+        }
+      }
+
+      displayEmployeeList();
+    });
 
     //Stampa lista Dipendenti
     function displayEmployeeList(){
