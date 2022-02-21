@@ -45,6 +45,8 @@ var data = [
 //creo un ID progressivo
 var nextID = 10006;
 
+
+
 $(document).ready(function (){
 
     displayEmployeeList();
