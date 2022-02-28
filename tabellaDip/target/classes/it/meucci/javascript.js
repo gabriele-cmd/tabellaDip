@@ -1,47 +1,5 @@
-var data = [
-    {
-      "id": 10001,
-      "birthDate": "1953-09-01",
-      "firstName": "Andrea",
-      "lastName": "Gorghi",
-      "gender": "M",
-      "hireDate": "1986-06-25",
-    },
-    {
-      "id": 10002,
-      "birthDate": "1964-06-01",
-      "firstName": "Erika",
-      "lastName": "Pedretti",
-      "gender": "F",
-      "hireDate": "1985-11-20",
-    },
-    {
-      "id": 10003,
-      "birthDate": "1959-12-02",
-      "firstName": "Luciano",
-      "lastName": "Lucio",
-      "gender": "M",
-      "hireDate": "1986-08-27",
-    },
-    {
-      "id": 10004,
-      "birthDate": "1954-04-30",
-      "firstName": "Claudio",
-      "lastName": "Canetta",
-      "gender": "M",
-      "hireDate": "1986-11-30",
-  
-    },
-    {
-      "id": 10005,
-      "birthDate": "1955-01-20",
-      "firstName": "Antonio",
-      "lastName": "Cocco",
-      "gender": "M",
-      "hireDate": "1989-09-11",
-  
-    }
-  ];
+
+var data = [];
 //creo un ID progressivo
 var nextID = 10006;
 
@@ -49,10 +7,14 @@ var nextID = 10006;
 
 $(document).ready(function (){
 
-    displayEmployeeList();
+    //Chiamata GET Ajax
+    $.get( "http://localhost:8080/employees", function( content ) {
+      data = content["_embedded"]["employees"];
+      displayEmployeeList();
+    });
 
     //Aggiungo un Dipendente
-    $('#crea-dipendente').on('submit', function(element){
+    $('#aggiungi').on('click', function(element){
         element.preventDefault(); //prevenire il comportamento di default e poterlo gestire
 
         var form_action = $("#crea-dipendente").attr("action");
@@ -60,9 +22,24 @@ $(document).ready(function (){
         var cognome = $("#cognome").val();
         var genere = $("#genere").val();
         display = "create";
+        var payload = { firstName: nome, lastName: cognome, gender: genere };
+        console.log(payload);
 
         if(nome != "" && cognome != ""){
-          data.push({id: nextID, firstName: nome, lastName: cognome, gender: genere});
+          //Chiamata POST Ajax
+          
+          $.ajax({
+            method: "POST",
+            url: "http://localhost:8080/employees",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(payload)
+          })
+          .done(function( msg ) {
+            alert( "Data Saved: " + msg );
+          });
+          
+
           nextID++;
           //Stampa il nuovo impiegato aggiunto
           displayEmployeeList();
@@ -88,6 +65,41 @@ $(document).ready(function (){
 
       displayEmployeeList();
     });
+
+    //Modifica Dipendente
+    $("body").on("click", ".modifica-dipendente", function(){
+      var id = $(this).parent("td").data("id");
+      var gender = $(this).parent("td").prev("td").text();
+      var firstName = $(this).parent("td").prev("td").prev("td").text();
+      var lastName = $(this).parent("td").prev("td").prev("td").prev("td").text();
+
+      $("$nomeMod").val(gender);
+      $("$cognomeMod").val(gender);
+      $("$genereMod").val(gender);
+      
+      $("#modify").on("click", function(e){
+        e.preventDefault();
+
+        var name = $("nomeMod").val();
+        var surname = $("cognomeMod").val();
+        var sesso = $("genereMod").val();
+
+        if(firstName != '' && lastName != ''){
+          for(let i = 0; i < data.length; i++){
+            if(data[i].id == id){
+              data[i].firstName = name;
+              data[i].lastName = surname;
+              data[i].gender = sesso;
+              break;
+            }
+          }
+          displayEmployeeList();
+          $("#modifica-dipendente").modal("hide");
+          toastr.success("Dipendente Modificato correttamente", "Success Alert", {timeout:5000});
+        }
+      })
+    });
+
 
     //Stampa lista Dipendenti
     function displayEmployeeList(){
