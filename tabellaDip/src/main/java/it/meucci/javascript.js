@@ -100,6 +100,29 @@ $(document).ready(function (){
       })
     });
 
+    function linkA(){
+      $.get(serverData[ "_links"]["next"]["href"], function(msg){
+        serverData = msg;
+        tabellaCodice();
+    
+      });
+    };
+    
+    function linkF(){
+      $.get(serverData[ "_links"]["first"]["href"], function(msg){
+        serverData = msg;
+        tabellaCodice();
+    
+      });
+    };
+    
+    function linkI(){
+      $.get(serverData[ "_links"]["profile"]["href"], function(msg){
+        serverData = msg;
+        tabellaCodice();
+    
+      });
+    };
 
     //Stampa lista Dipendenti
     function displayEmployeeList(){
