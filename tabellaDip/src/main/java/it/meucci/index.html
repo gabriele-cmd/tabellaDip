@@ -36,7 +36,7 @@
 
         </table>
 
-        <!--Add Employee Modal-->
+        <!--Modal Aggiunta Dipendente-->
         <div class="modal fade" id="crea-dipendente" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -70,7 +70,7 @@
             </div>
         </div>
 
-        <!--Modify Employee Modal-->
+        <!--Modal Modifica Dipendente-->
         <div class="modal fade" id="modifica-dipendente" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -104,22 +104,28 @@
           </div>
       </div>
 
-        <!--Page Navigation-->
+        <!--NavBar Paginazione-->
         <nav aria-label="Page navigation example">
           <ul class="pagination pagination-lg justify-content-center">
+
+            <li class="page-item"><a class="page-link" onclick="linkF()" href="#">First</a></li>
+
             <li class="page-item">
               <a class="page-link" onclick="linkP()" href="#" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
-            <li class="page-item"><a class="page-link" onclick="linkF()" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" onclick="linkS()" href="#">1</a></li>
             
             <li class="page-item">
               <a onclick="linkA()" class="page-link" href="#" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
               </a>
             </li>
+
+            <li class="page-item"><a class="page-link" onclick="linkL()" href="#">Last</a></li>
           </ul>
         </nav>
+
     </body>
 </html>

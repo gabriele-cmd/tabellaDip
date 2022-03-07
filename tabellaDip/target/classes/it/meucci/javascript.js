@@ -1,5 +1,5 @@
-
-var data = [];
+var serverData;
+var selfUrl;
 //creo un ID progressivo
 var nextID = 10006;
 
@@ -7,11 +7,7 @@ var nextID = 10006;
 
 $(document).ready(function (){
 
-    //Chiamata GET Ajax
-    $.get( "http://localhost:8080/employees", function( content ) {
-      data = content["_embedded"]["employees"];
-      displayEmployeeList();
-    });
+  leggiServer("http://localhost:8080/employees");
 
     //Aggiungo un Dipendente
     $('#aggiungi').on('click', function(element){
@@ -23,7 +19,6 @@ $(document).ready(function (){
         var genere = $("#genere").val();
         display = "create";
         var payload = { firstName: nome, lastName: cognome, gender: genere };
-        console.log(payload);
 
         if(nome != "" && cognome != ""){
           //Chiamata POST Ajax
@@ -36,17 +31,13 @@ $(document).ready(function (){
             data: JSON.stringify(payload)
           })
           .done(function( msg ) {
-            alert( "Data Saved: " + msg );
+            alert( 'Item creato con Successo!', 'Success Alert', {timeout: 5000});
           });
           
 
           nextID++;
-          //Stampa il nuovo impiegato aggiunto
-          displayEmployeeList();
-
-          //Nascondi Modal
           $("#crea-dipendente").modal('hide');
-          toastr.success('Item creato con Successo!', 'Success Alert', {timeout: 5000});
+          //toastr.success('Item creato con Successo!', 'Success Alert', {timeout: 5000});
         }
         else{
           alert("Tutti i campi devono essere riempiti! Riprova...");
@@ -57,85 +48,92 @@ $(document).ready(function (){
     $("body").on("click", ".elimina-dipendente", function(){
       var id = $(this).parent("td").data("id");
 
-      for (let i = 0; i < data.length; i++){
-        if(data[i].id == id){
-          data.splice(i, 1);
+      $.ajax({
+        type: "DELETE",
+        url: "http://localhost:8080/employees/" + id,
+        success: function (data) {
+          leggiServer(selfUrl);
         }
-      }
-
-      displayEmployeeList();
+      });
     });
 
     //Modifica Dipendente
     $("body").on("click", ".modifica-dipendente", function(){
+      var form_action = $("#crea-dipendente").attr("action");
       var id = $(this).parent("td").data("id");
-      var gender = $(this).parent("td").prev("td").text();
-      var firstName = $(this).parent("td").prev("td").prev("td").text();
-      var lastName = $(this).parent("td").prev("td").prev("td").prev("td").text();
+      var genere = $(this).parent("td").prev("td").text();
+      var nome = $(this).parent("td").prev("td").prev("td").text();
+      var cognome = $(this).parent("td").prev("td").prev("td").prev("td").text();
 
-      $("$nomeMod").val(gender);
-      $("$cognomeMod").val(gender);
-      $("$genereMod").val(gender);
+      $("$nomeMod").val(nome);
+      $("$cognomeMod").val(cognome);
+      $("$genereMod").val(genere);
       
       $("#modify").on("click", function(e){
         e.preventDefault();
 
-        var name = $("nomeMod").val();
-        var surname = $("cognomeMod").val();
-        var sesso = $("genereMod").val();
+        var name = $("#nomeMod").val();
+        var surname = $("#cognomeMod").val();
+        var sesso = $("#genereMod").val();
 
-        if(firstName != '' && lastName != ''){
-          for(let i = 0; i < data.length; i++){
-            if(data[i].id == id){
-              data[i].firstName = name;
-              data[i].lastName = surname;
-              data[i].gender = sesso;
-              break;
-            }
+        var payload = { firstName: name, lastName: surname, gender: sesso };
+        //ATTENZIONE UTILIZZARE CHIAMATE GET AJAX PER LE VARIABILI
+        $.ajax({
+          type: 'PUT',
+          url: "http://localhost:8080/employees/" + id,
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(payload),
+          success: function(data) {
+            leggiServer(selfUrl);
           }
-          displayEmployeeList();
-          $("#modifica-dipendente").modal("hide");
-          toastr.success("Dipendente Modificato correttamente", "Success Alert", {timeout:5000});
-        }
-      })
+        });
+        $("#modifica-dipendente").modal("hide");
+      });
     });
 
     function linkA(){
-      $.get(serverData[ "_links"]["next"]["href"], function(msg){
-        serverData = msg;
-        tabellaCodice();
-    
-      });
+      leggiServer(serverData[ "_links"]["next"]["href"]);
     };
     
     function linkF(){
-      $.get(serverData[ "_links"]["first"]["href"], function(msg){
-        serverData = msg;
-        tabellaCodice();
-    
-      });
+      leggiServer(serverData[ "_links"]["first"]["href"]);
+    };
+
+    function linkL(){
+      leggiServer(serverData[ "_links"]["last"]["href"]);
     };
     
     function linkI(){
-      $.get(serverData[ "_links"]["profile"]["href"], function(msg){
-        serverData = msg;
-        tabellaCodice();
-    
-      });
+      leggiServer(serverData[ "_links"]["prev"]["href"]);
     };
 
+    function linkS(){
+      leggiServer(serverData[ "_links"]["self"]["href"]);
+    };
+
+
+    function leggiServer(url){
+      selfUrl = url;
+      //Chiamata GET Ajax
+      $.get( url, function( msg ) {
+        serverData = msg;
+        displayEmployeeList();
+      });
+  
+  }
     //Stampa lista Dipendenti
     function displayEmployeeList(){
         //creo il body della tabella
         var rows = '';
-        $.each(data, function(index, value){
+        $.each(serverData["_embedded"]["employees"], function(index, value){
             rows = rows + '<tr>';
             rows = rows + '<td>' + value.id + '</td>';
             rows = rows + '<td>' + value.firstName + '</td>';
             rows = rows + '<td>' + value.lastName + '</td>';
             rows = rows + '<td>' + value.gender + '</td>';
             rows = rows + '<td data-id="' + value.id + '">';
-            rows = rows + '<button class="btn btn-warning btn-sm modifica-dipendente"> Modifica </button>  ';
+            rows = rows + '<button class="btn btn-warning btn-sm modifica-dipendente" data-bs-toggle="modal" data-bs-target="#modifica-dipendente"> Modifica </button>  ';
             rows = rows + '<button class="btn btn-danger btn-sm elimina-dipendente"> Elimina </button>';
             rows = rows + '</td>';
             rows = rows + '</tr>';
