@@ -13,11 +13,9 @@ $(document).ready(function (){
     $('#aggiungi').on('click', function(element){
         element.preventDefault(); //prevenire il comportamento di default e poterlo gestire
 
-        var form_action = $("#crea-dipendente").attr("action");
         var nome = $("#nome").val();
         var cognome = $("#cognome").val();
         var genere = $("#genere").val();
-        display = "create";
         var payload = { firstName: nome, lastName: cognome, gender: genere };
 
         if(nome != "" && cognome != ""){
@@ -78,17 +76,22 @@ $(document).ready(function (){
 
         var payload = { firstName: name, lastName: surname, gender: sesso };
         //ATTENZIONE UTILIZZARE CHIAMATE GET AJAX PER LE VARIABILI
+        
         $.ajax({
           type: 'PUT',
           url: "http://localhost:8080/employees/" + id,
           dataType: "json",
           contentType: "application/json",
           data: JSON.stringify(payload),
+
           success: function(data) {
             leggiServer(selfUrl);
           }
+
         });
+
         $("#modifica-dipendente").modal("hide");
+
       });
     });
 
@@ -120,8 +123,14 @@ $(document).ready(function (){
         serverData = msg;
         displayEmployeeList();
       });
-  
   }
+
+  function setModal(id) {
+    $("#nomeMod").prop("placeholder", $("#nome-" + id).text());
+    $("#nomeMod").prop("placeholder", $("#cognome-" + id).text());
+    $("#genereMod").val($("#genere-" + id).text());
+  }
+
     //Stampa lista Dipendenti
     function displayEmployeeList(){
         //creo il body della tabella
@@ -133,7 +142,7 @@ $(document).ready(function (){
             rows = rows + '<td>' + value.lastName + '</td>';
             rows = rows + '<td>' + value.gender + '</td>';
             rows = rows + '<td data-id="' + value.id + '">';
-            rows = rows + '<button class="btn btn-warning btn-sm modifica-dipendente" data-bs-toggle="modal" data-bs-target="#modifica-dipendente"> Modifica </button>  ';
+            rows = rows + '<button class="btn btn-warning btn-sm modifica-dipendente" onclick = "setModal(' + value.id + ')" data-bs-toggle="modal" data-bs-target="#modifica-dipendente"> Modifica </button>  ';
             rows = rows + '<button class="btn btn-danger btn-sm elimina-dipendente"> Elimina </button>';
             rows = rows + '</td>';
             rows = rows + '</tr>';
