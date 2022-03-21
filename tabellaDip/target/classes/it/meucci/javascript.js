@@ -4,6 +4,41 @@ var selfUrl;
 var nextID = 10006;
 
 
+function leggiServer(url){
+  selfUrl = url;
+  //Chiamata GET Ajax
+  $.get( url, function( msg ) {
+    serverData = msg;
+    displayEmployeeList();
+  });
+}
+
+//Stampa lista Dipendenti
+function displayEmployeeList(){
+//creo il body della tabella
+  var rows = '';
+  $.each(serverData["_embedded"]["employees"], function(index, value){
+    rows = rows + '<tr>';
+    rows = rows + '<td>' + value.id + '</td>';
+    rows = rows + '<td>' + value.firstName + '</td>';
+    rows = rows + '<td>' + value.lastName + '</td>';
+    rows = rows + '<td>' + value.gender + '</td>';
+    rows = rows + '<td data-id="' + value.id + '">';
+    rows = rows + '<button class="btn btn-warning btn-sm modifica-dipendente" onclick = "setModal(' + value.id + ')" data-bs-toggle="modal" data-bs-target="#modifica-dipendente"> Modifica </button>  ';
+    rows = rows + '<button class="btn btn-danger btn-sm elimina-dipendente"> Elimina </button>';
+    rows = rows + '</td>';
+    rows = rows + '</tr>';
+  });
+    
+  //attraverso il metodo html di jQuery sostituisco il body creato (rows) all'attributo tbody della tabella
+    $("#tbody").html(rows);
+  }
+
+function setModal(id) {
+  $("#nomeMod").prop("placeholder", $("#nome-" + id).text());
+  $("#cognomeMod").prop("placeholder", $("#cognome-" + id).text());
+  $("#genereMod").val($("#genere-" + id).text());
+}
 
 $(document).ready(function (){
 
@@ -56,7 +91,7 @@ $(document).ready(function (){
     });
 
     //Modifica Dipendente
-    $("body").on("click", ".modifica-dipendente", function(){
+    $("#modify").on("click", function(){
       var form_action = $("#crea-dipendente").attr("action");
       var id = $(this).parent("td").data("id");
       var genere = $(this).parent("td").prev("td").text();
@@ -95,62 +130,27 @@ $(document).ready(function (){
       });
     });
 
-    function linkA(){
-      leggiServer(serverData[ "_links"]["next"]["href"]);
-    };
-    
-    function linkF(){
-      leggiServer(serverData[ "_links"]["first"]["href"]);
-    };
 
-    function linkL(){
-      leggiServer(serverData[ "_links"]["last"]["href"]);
-    };
-    
-    function linkI(){
-      leggiServer(serverData[ "_links"]["prev"]["href"]);
-    };
-
-    function linkS(){
-      leggiServer(serverData[ "_links"]["self"]["href"]);
-    };
-
-
-    function leggiServer(url){
-      selfUrl = url;
-      //Chiamata GET Ajax
-      $.get( url, function( msg ) {
-        serverData = msg;
-        displayEmployeeList();
-      });
-  }
-
-  function setModal(id) {
-    $("#nomeMod").prop("placeholder", $("#nome-" + id).text());
-    $("#nomeMod").prop("placeholder", $("#cognome-" + id).text());
-    $("#genereMod").val($("#genere-" + id).text());
-  }
-
-    //Stampa lista Dipendenti
-    function displayEmployeeList(){
-        //creo il body della tabella
-        var rows = '';
-        $.each(serverData["_embedded"]["employees"], function(index, value){
-            rows = rows + '<tr>';
-            rows = rows + '<td>' + value.id + '</td>';
-            rows = rows + '<td>' + value.firstName + '</td>';
-            rows = rows + '<td>' + value.lastName + '</td>';
-            rows = rows + '<td>' + value.gender + '</td>';
-            rows = rows + '<td data-id="' + value.id + '">';
-            rows = rows + '<button class="btn btn-warning btn-sm modifica-dipendente" onclick = "setModal(' + value.id + ')" data-bs-toggle="modal" data-bs-target="#modifica-dipendente"> Modifica </button>  ';
-            rows = rows + '<button class="btn btn-danger btn-sm elimina-dipendente"> Elimina </button>';
-            rows = rows + '</td>';
-            rows = rows + '</tr>';
-        });
-    
-        //attraverso il metodo html di jQuery sostituisco il body creato (rows) all'attributo tbody della tabella
-        $("#tbody").html(rows);
-    }
 });
+
+function linkNext(){
+  leggiServer(serverData[ "_links"]["next"]["href"]);
+};
+
+function linkFirst(){
+  leggiServer(serverData[ "_links"]["first"]["href"]);
+};
+
+function linkLast(){
+  leggiServer(serverData[ "_links"]["last"]["href"]);
+};
+
+function linkPrev(){
+  leggiServer(serverData[ "_links"]["prev"]["href"]);
+};
+
+function linkSelf(){
+  leggiServer(serverData[ "_links"]["self"]["href"]);
+};
 
 
